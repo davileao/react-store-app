@@ -5,7 +5,11 @@ import {
     signInWithGooglePopup
 } from "../../utils/firebase.utils";
 import FormInput from "../form-input";
-import {useState} from "react";
+import {useState, useContext} from "react";
+
+import {UserContext} from "../../contexts/user.context";
+import { useNavigate} from "react-router-dom";
+
 
 const defaultFormFields = {
     email: '',
@@ -17,23 +21,36 @@ const SignInForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
     const {email, password} = formFields;
 
+    // const {setCurrentUser} = useContext(UserContext);
+    const navigate = useNavigate();
+
 
     const resetFormFields = () => {
         setFormFields(defaultFormFields);
     }
 
     const signInWithGoogle = async () => {
-        const {user} = await signInWithGooglePopup();
-        await createUserDocumentFromAuth(user);
-    }
+        await signInWithGooglePopup().then(() => navigate('/'));
+
+        }
+        // setCurrentUser(user);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const response = await signInAuthUserWithEmailAndPassword(email, password);
+            // const {user} = await signInAuthUserWithEmailAndPassword(
+            //     email,
+            //     password
+            // ); com o listener no user.context.jsx, não é necessário fazer o setCurrentUser
 
-            console.log(response);
+            await signInAuthUserWithEmailAndPassword(
+                email,
+                password
+            ).then(() => navigate('/'));
+            // setCurrentUser(user)
+
+            // console.log(response);
 
             resetFormFields();
 
